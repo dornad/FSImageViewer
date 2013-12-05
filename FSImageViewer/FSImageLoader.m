@@ -87,10 +87,16 @@
     }
     else {
         [self cancelRequestForUrl:aURL];
+        
+        // Adds x-www-form-urlencoded for Amazon S3 bucket download.
+        AFImageResponseSerializer *responseSerializer = [AFImageResponseSerializer serializer];
+        NSMutableSet *contentTypes = [NSMutableSet setWithSet:responseSerializer.acceptableContentTypes];
+        [contentTypes addObject:@"application/x-www-form-urlencoded"];
+        responseSerializer.acceptableContentTypes = contentTypes;
 
         NSURLRequest *urlRequest = [[NSURLRequest alloc] initWithURL:aURL cachePolicy:NSURLRequestReturnCacheDataElseLoad timeoutInterval:_timeoutInterval];
         AFHTTPRequestOperation *imageRequestOperation = [[AFHTTPRequestOperation alloc] initWithRequest:urlRequest];
-        imageRequestOperation.responseSerializer = [AFImageResponseSerializer serializer];
+        imageRequestOperation.responseSerializer = responseSerializer;
         [runningRequests addObject:imageRequestOperation];
         __weak AFHTTPRequestOperation *imageRequestOperationForBlock = imageRequestOperation;
 
